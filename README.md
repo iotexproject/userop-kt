@@ -1,5 +1,6 @@
-## userop-kt
+![](https://user-images.githubusercontent.com/16026265/268563978-46911948-aa87-4fd3-9ddb-0a504f801f3f.png)
 
+## userop-kt
 ---
 
 ### Summary
@@ -7,7 +8,6 @@
 An account abstraction proposal which completely avoids the need for consensus-layer protocol changes. Instead of adding new protocol features and changing the bottom-layer transaction type, this proposal instead introduces a higher-layer pseudo-transaction object called a UserOperation. Users send UserOperation objects into a separate mempool. A special class of actor called bundlers package up a set of these objects into a transaction making a handleOps call to a special contract, and that transaction then gets included in a block.
 
 [ERC-4337: Account Abstraction Using Alt Mempool](https://eips.ethereum.org/EIPS/eip-4337)
-
 ---
 
 ### Usage
