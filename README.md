@@ -16,7 +16,7 @@ An account abstraction proposal which completely avoids the need for consensus-l
 
 Create a signer object that provides a publicKey and a signature method.
 
-```
+```kotlin
 class P256Signer: ISigner {
     override val address: String
         get() = "0x00000000000000000000000000000000"
@@ -32,7 +32,7 @@ class P256Signer: ISigner {
 
 #### Get account address
 
-```
+```kotlin
 val builder = P256AccountBuilder.init(RPC_URL, P256Signer(), PresetBuilderOpts(
     entryPoint = ENTRY_POINT,
     factory = ACCOUNT_FACTORY,
@@ -45,7 +45,7 @@ println("Account address: $address")
 
 #### Send currency
 
-```
+```kotlin
 val to = "Receipt address"
 val value = BigInteger.ONE
 val data = "0x"
@@ -60,7 +60,7 @@ println("txHash: $txHash")
 
 #### Send Erc20
 
-```
+```kotlin
 val erc20Contract = "Contract address"
 val to = "Receipt address"
 val value = BigInteger.ONE
