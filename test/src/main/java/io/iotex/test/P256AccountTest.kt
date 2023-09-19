@@ -29,7 +29,7 @@ fun main() {
             bundlerRpc = BUNDLER_RPC
         ))
         val address = builder.sender
-        println(address)
+        println("Account address: $address")
 
         val client = Client.init(rpcUrl = RPC_URL, entryPoint = ENTRY_POINT, bundlerRpc = BUNDLER_RPC)
 
