@@ -3,11 +3,11 @@ package io.iotex.userop.preset.middleware
 import io.iotex.userop.api.IUserOperationMiddleware
 import io.iotex.userop.api.IUserOperationMiddlewareCtx
 import io.iotex.userop.provider.JsonRpcProvider
-import io.iotex.userop.utils.prependHexPrefix
 import org.web3j.protocol.core.DefaultBlockParameterName
 import org.web3j.protocol.core.methods.response.EthBlock
 import org.web3j.protocol.core.methods.response.EthGasPrice
 import org.web3j.protocol.core.methods.response.EthMaxPriorityFeePerGas
+import org.web3j.utils.Numeric
 import java.math.BigInteger
 
 class GasPriceMiddleware(val provider: JsonRpcProvider) : IUserOperationMiddleware {
@@ -15,12 +15,12 @@ class GasPriceMiddleware(val provider: JsonRpcProvider) : IUserOperationMiddlewa
     override fun process(ctx: IUserOperationMiddlewareCtx) {
         runCatching {
             val gasList = eip1559GasPrice()
-            ctx.op.maxFeePerGas = gasList[0].toString(16).prependHexPrefix()
-            ctx.op.maxPriorityFeePerGas = gasList[1].toString(16).prependHexPrefix()
+            ctx.op.maxFeePerGas = Numeric.prependHexPrefix(gasList[0].toString(16))
+            ctx.op.maxPriorityFeePerGas = Numeric.prependHexPrefix(gasList[1].toString(16))
         }.onFailure {
             val gasList = legacyGasPrice()
-            ctx.op.maxFeePerGas = gasList[0].toString(16).prependHexPrefix()
-            ctx.op.maxPriorityFeePerGas = gasList[1].toString(16).prependHexPrefix()
+            ctx.op.maxFeePerGas = Numeric.prependHexPrefix(gasList[0].toString(16))
+            ctx.op.maxPriorityFeePerGas = Numeric.prependHexPrefix(gasList[1].toString(16))
         }
     }
 

@@ -1,8 +1,8 @@
 package io.iotex.userop.preset.builder
 
 import io.iotex.userop.PresetBuilderOpts
-import io.iotex.userop.api.ISigner
 import io.iotex.userop.UserOperationBuilder
+import io.iotex.userop.api.ISigner
 import io.iotex.userop.constants.ACCOUNT_ADDRESS
 import io.iotex.userop.constants.ENTRY_POINT
 import io.iotex.userop.contract.EntryPoint
@@ -12,11 +12,7 @@ import io.iotex.userop.preset.middleware.GasEstimateMiddleware
 import io.iotex.userop.preset.middleware.GasPriceMiddleware
 import io.iotex.userop.preset.middleware.ResolveAccountMiddleware
 import io.iotex.userop.preset.middleware.SignatureMiddleware
-import io.iotex.userop.preset.middleware.VerifyingPaymaster
 import io.iotex.userop.provider.BundlerJsonRpcProvider
-import io.iotex.userop.utils.cleanHexPrefix
-import io.iotex.userop.utils.toHexByteArray
-import io.iotex.userop.utils.toHexString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.web3j.abi.FunctionEncoder
@@ -29,6 +25,7 @@ import org.web3j.abi.datatypes.generated.Uint256
 import org.web3j.crypto.Hash
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.http.HttpService
+import org.web3j.utils.Numeric
 import java.math.BigInteger
 
 class P256AccountBuilder(val rpcUrl: String, val signer: ISigner, val opts: PresetBuilderOpts?) : UserOperationBuilder() {
@@ -45,7 +42,7 @@ class P256AccountBuilder(val rpcUrl: String, val signer: ISigner, val opts: Pres
             listOf(
                 Address(to),
                 Uint256(value),
-                DynamicBytes(data.toHexByteArray())
+                DynamicBytes(Numeric.hexStringToByteArray(data))
             ),
             listOf()
         )
@@ -59,7 +56,7 @@ class P256AccountBuilder(val rpcUrl: String, val signer: ISigner, val opts: Pres
             listOf(
                 Address(to),
                 Uint256(value),
-                DynamicBytes(data.toHexByteArray())
+                DynamicBytes(Numeric.hexStringToByteArray(data))
             ),
             listOf()
         )
@@ -74,7 +71,7 @@ class P256AccountBuilder(val rpcUrl: String, val signer: ISigner, val opts: Pres
                 val instance = P256AccountBuilder(rpcUrl, signer, opts)
                 if (sender.isNullOrBlank()) {
                     instance.initCode = initCode(signer, opts, instance.accountFactory)
-                    instance.entryPoint.getSenderAddress(instance.initCode.toHexByteArray())
+                    instance.entryPoint.getSenderAddress(Numeric.hexStringToByteArray(instance.initCode))
                     val address = instance.accountFactory.getAddress(signer.publicKey, opts?.salt ?: BigInteger.ZERO).send()
                     instance.proxy = P256Account.load(address, instance.web3j)
                     instance.sender = address
@@ -84,7 +81,8 @@ class P256AccountBuilder(val rpcUrl: String, val signer: ISigner, val opts: Pres
                 }
                 instance.apply {
                     initCode = initCode(signer, opts, instance.accountFactory)
-                    signature = signer.sign(Hash.sha3("0xdead".toByteArray())).toHexString()
+                    val bytes = signer.sign(Hash.sha3(Numeric.hexStringToByteArray("0xdead")))
+                    signature = Numeric.toHexString(bytes)
                     useMiddleware(
                         ResolveAccountMiddleware(instance.entryPoint, instance.initCode),
                         GasPriceMiddleware(instance.provider),
@@ -109,7 +107,7 @@ class P256AccountBuilder(val rpcUrl: String, val signer: ISigner, val opts: Pres
                 listOf(object : TypeReference<Address>() {})
             )
             val data = FunctionEncoder.encode(function)
-            return "${accountFactory.contractAddress}${data.cleanHexPrefix()}"
+            return "${accountFactory.contractAddress}${Numeric.cleanHexPrefix(data)}"
         }
     }
 

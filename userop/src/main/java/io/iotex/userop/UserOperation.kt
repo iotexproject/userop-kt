@@ -3,8 +3,8 @@ package io.iotex.userop
 import io.iotex.userop.api.IUserOperationBuilder
 import io.iotex.userop.api.IUserOperationMiddleware
 import io.iotex.userop.preset.middleware.UserOperationMiddlewareCtx
-import io.iotex.userop.utils.prependHexPrefix
 import org.web3j.abi.datatypes.Address
+import org.web3j.utils.Numeric
 import java.math.BigInteger
 
 data class UserOperation(
@@ -12,9 +12,9 @@ data class UserOperation(
     var nonce: String = "0x0",
     var initCode: String = "0x",
     var callData: String = "0x",
-    var callGasLimit: String = BigInteger("35000").toString(16).prependHexPrefix(),
-    var verificationGasLimit: String = BigInteger("70000").toString(16).prependHexPrefix(),
-    var preVerificationGas: String = BigInteger("21000").toString(16).prependHexPrefix(),
+    var callGasLimit: String = Numeric.prependHexPrefix(BigInteger("35000").toString(16)),
+    var verificationGasLimit: String = Numeric.prependHexPrefix(BigInteger("70000").toString(16)),
+    var preVerificationGas: String = Numeric.prependHexPrefix(BigInteger("21000").toString(16)),
     var maxFeePerGas: String = "0x0",
     var maxPriorityFeePerGas: String = "0x0",
     var paymasterAndData: String = "0x",

@@ -1,7 +1,6 @@
 package io.iotex.userop.api
 
 import io.iotex.userop.UserOperation
-import io.iotex.userop.utils.prependHexPrefix
 import java.math.BigInteger
 
 interface IUserOperationBuilder {
