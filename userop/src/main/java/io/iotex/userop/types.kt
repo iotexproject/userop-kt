@@ -6,7 +6,7 @@ import java.math.BigInteger
 data class PresetBuilderOpts(
     val entryPoint: String,
     val factory: String,
-    val salt: BigInteger,
+    val salt: BigInteger? = null,
     val bundlerRpc: String,
     val paymasterMiddleware: IUserOperationMiddleware? = null
 )
