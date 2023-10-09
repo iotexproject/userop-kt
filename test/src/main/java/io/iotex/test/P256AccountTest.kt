@@ -4,6 +4,7 @@ import io.iotex.userop.Client
 import io.iotex.userop.PresetBuilderOpts
 import io.iotex.userop.api.IClient
 import io.iotex.userop.preset.builder.P256AccountBuilder
+import io.iotex.userop.preset.middleware.VerifyingPaymaster
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.web3j.abi.FunctionEncoder
@@ -12,10 +13,11 @@ import org.web3j.abi.datatypes.Function
 import org.web3j.abi.datatypes.generated.Uint256
 import java.math.BigInteger
 
-const val RPC_URL = "Your rpc url"
-const val ENTRY_POINT = "Your entry point"
-const val ACCOUNT_FACTORY = "Your account factory"
-const val BUNDLER_RPC = "Your bundler rpc"
+const val RPC_URL = "https://babel-api.testnet.iotex.io"
+const val ENTRY_POINT = "0xc3527348De07d591c9d567ce1998eFA2031B8675"
+const val ACCOUNT_FACTORY = "0x8D6f2C1839c9bd633A1972Ac50B24D8EA188a372"
+const val BUNDLER_RPC = "https://bundler.testnet.w3bstream.com"
+const val PAYMASTER_RPC = "https://paymaster.testnet.w3bstream.com/rpc/API_KEY"
 
 fun main() {
 
@@ -26,7 +28,9 @@ fun main() {
             entryPoint = ENTRY_POINT,
             factory = ACCOUNT_FACTORY,
             salt = BigInteger.ZERO,
-            bundlerRpc = BUNDLER_RPC
+            bundlerRpc = BUNDLER_RPC,
+            // use paymaster
+            paymasterMiddleware = VerifyingPaymaster(PAYMASTER_RPC)
         ))
         val address = builder.sender
         println("Account address: $address")
