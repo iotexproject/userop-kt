@@ -1,6 +1,7 @@
 package io.iotex.test
 
 import io.iotex.userop.api.ISigner
+import org.web3j.utils.Numeric
 
 class P256Signer: ISigner {
     override val address: String
@@ -10,6 +11,6 @@ class P256Signer: ISigner {
         get() = ByteArray(64)
 
     override fun sign(data: ByteArray): ByteArray {
-        return ByteArray(64)
+        return Numeric.hexStringToByteArray(P256KeyManager.signData(data))
     }
 }
