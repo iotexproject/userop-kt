@@ -4,7 +4,7 @@ import io.iotex.userop.Client
 import io.iotex.userop.PresetBuilderOpts
 import io.iotex.userop.api.IClient
 import io.iotex.userop.preset.builder.P256AccountBuilder
-import io.iotex.userop.preset.middleware.VerifyingPaymaster
+import io.iotex.userop.preset.middleware.PaymasterMiddleware
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.web3j.abi.FunctionEncoder
@@ -30,7 +30,7 @@ fun main() {
             salt = BigInteger.ZERO,
             bundlerRpc = BUNDLER_RPC,
             // use paymaster
-            paymasterMiddleware = VerifyingPaymaster(PAYMASTER_RPC)
+            paymasterMiddleware = PaymasterMiddleware(PAYMASTER_RPC)
         ))
         val address = builder.sender
         println("Account address: $address")

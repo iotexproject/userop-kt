@@ -22,7 +22,7 @@ data class UserOperation(
 )
 
 abstract class UserOperationBuilder: IUserOperationBuilder {
-    private val defaultOp: UserOperation = UserOperation()
+    private var defaultOp: UserOperation = UserOperation()
     private var currOp: UserOperation = defaultOp
     private val middlewareStack = mutableListOf<IUserOperationMiddleware>()
 
@@ -84,6 +84,14 @@ abstract class UserOperationBuilder: IUserOperationBuilder {
 
     override fun resetOp() = apply {
         this.currOp = this.defaultOp
+    }
+
+    override fun useDefaultOp(op: UserOperation) = apply {
+        this.defaultOp = op
+    }
+
+    override fun resetDefault() = apply {
+        this.defaultOp = UserOperation()
     }
 
     override fun useMiddleware(vararg middleware: IUserOperationMiddleware) = apply {

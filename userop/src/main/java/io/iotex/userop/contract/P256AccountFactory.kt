@@ -22,9 +22,9 @@ class P256AccountFactory(
     contractGasProvider: ContractGasProvider
 ) : Contract(BINARY, contract, web3j, transactionManager, contractGasProvider) {
 
-    fun getAddress(pubKey: ByteArray, salt: BigInteger) : RemoteFunctionCall<String> {
+    fun createAddress(pubKey: ByteArray, salt: BigInteger) : RemoteFunctionCall<String> {
         val function = Function(
-            FUNC_GET_ADDRESS,
+            FUNC_CREATE_ADDRESS,
             listOf<Type<*>>(
                 DynamicBytes(pubKey),
                 Uint256(salt)
@@ -36,7 +36,7 @@ class P256AccountFactory(
 
     companion object {
         const val BINARY = "Bin file was not provided"
-        const val FUNC_GET_ADDRESS = "getAddress"
+        const val FUNC_CREATE_ADDRESS = "createAccount"
 
         fun load(
             contract: String,

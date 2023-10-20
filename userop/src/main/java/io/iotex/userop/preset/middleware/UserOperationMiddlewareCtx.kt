@@ -33,13 +33,14 @@ class UserOperationMiddlewareCtx(
         val encodedOp = FunctionEncoder.encodeConstructor(listOf(struct))
         val packedStr = encodedOp.substring(64, encodedOp.length)
         val hashBytes = Hash.sha3(Numeric.hexStringToByteArray(packedStr))
-        return FunctionEncoder.encodeConstructor(
+        val encoded = FunctionEncoder.encodeConstructor(
             listOf(
                 Bytes32(hashBytes),
                 Address(entryPoint),
                 Uint256(chainId)
             )
         )
+        return Numeric.toHexString(Hash.sha3(Numeric.hexStringToByteArray(encoded)))
     }
 
 }

@@ -30,8 +30,6 @@ Create a signer object that provides a publicKey and a signature method.
 
 ```kotlin
 class P256Signer: ISigner {
-    override val address: String
-        get() = "0x00000000000000000000000000000000"
 
     override val publicKey: ByteArray
         get() = ByteArray(64)

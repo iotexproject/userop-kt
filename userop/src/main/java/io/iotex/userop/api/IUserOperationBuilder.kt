@@ -21,6 +21,10 @@ interface IUserOperationBuilder {
 
     fun resetOp(): IUserOperationBuilder
 
+    fun useDefaultOp(op: UserOperation): IUserOperationBuilder
+
+    fun resetDefault(): IUserOperationBuilder
+
     fun useMiddleware(vararg middleware: IUserOperationMiddleware): IUserOperationBuilder
 
     fun resetMiddleware(): IUserOperationBuilder

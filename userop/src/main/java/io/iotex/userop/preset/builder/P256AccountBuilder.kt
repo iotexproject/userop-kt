@@ -1,6 +1,7 @@
 package io.iotex.userop.preset.builder
 
 import io.iotex.userop.PresetBuilderOpts
+import io.iotex.userop.UserOperation
 import io.iotex.userop.UserOperationBuilder
 import io.iotex.userop.api.ISigner
 import io.iotex.userop.constants.ACCOUNT_ADDRESS
@@ -70,9 +71,7 @@ class P256AccountBuilder(val rpcUrl: String, val signer: ISigner, val opts: Pres
             return withContext(Dispatchers.IO) {
                 val instance = P256AccountBuilder(rpcUrl, signer, opts)
                 if (sender.isNullOrBlank()) {
-                    instance.initCode = initCode(signer, opts, instance.accountFactory)
-                    instance.entryPoint.getSenderAddress(Numeric.hexStringToByteArray(instance.initCode))
-                    val address = instance.accountFactory.getAddress(signer.publicKey, opts?.salt ?: BigInteger.ZERO).send()
+                    val address = instance.accountFactory.createAddress(signer.publicKey, opts?.salt ?: BigInteger.ZERO).send()
                     instance.proxy = P256Account.load(address, instance.web3j)
                     instance.sender = address
                 } else {
@@ -83,6 +82,12 @@ class P256AccountBuilder(val rpcUrl: String, val signer: ISigner, val opts: Pres
                     initCode = initCode(signer, opts, instance.accountFactory)
                     val bytes = signer.sign(Hash.sha3(Numeric.hexStringToByteArray("0xdead")))
                     signature = Numeric.toHexString(bytes)
+                    useDefaultOp(
+                        UserOperation(
+                            sender = instance.sender,
+                            signature = instance.signature
+                        )
+                    )
                     useMiddleware(
                         ResolveAccountMiddleware(instance.entryPoint, instance.initCode),
                         GasPriceMiddleware(instance.provider),

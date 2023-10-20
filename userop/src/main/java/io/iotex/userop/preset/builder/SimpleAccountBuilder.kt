@@ -71,8 +71,7 @@ class SimpleAccountBuilder(val rpcUrl: String, val signer: ISigner, val opts: Pr
                 val instance = SimpleAccountBuilder(rpcUrl, signer, opts)
                 if (sender.isNullOrBlank()) {
                     instance.initCode = initCode(signer, opts, instance.accountFactory)
-                    instance.entryPoint.getSenderAddress(Numeric.hexStringToByteArray(instance.initCode))
-                    val address = instance.accountFactory.getAddress(signer.publicKey, opts?.salt ?: BigInteger.ZERO).send()
+                    val address = instance.accountFactory.createAddress(signer.publicKey, opts?.salt ?: BigInteger.ZERO).send()
                     instance.proxy = P256Account.load(address, instance.web3j)
                     instance.sender = address
                 } else {
