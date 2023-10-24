@@ -70,14 +70,11 @@ class P256AccountBuilder(val rpcUrl: String, val signer: ISigner, val opts: Pres
         suspend fun init(sender: String?, rpcUrl: String, signer: ISigner, opts: PresetBuilderOpts?): P256AccountBuilder {
             return withContext(Dispatchers.IO) {
                 val instance = P256AccountBuilder(rpcUrl, signer, opts)
-                if (sender.isNullOrBlank()) {
-                    val address = instance.accountFactory.createAddress(signer.publicKey, opts?.salt ?: BigInteger.ZERO).send()
-                    instance.proxy = P256Account.load(address, instance.web3j)
-                    instance.sender = address
-                } else {
-                    instance.proxy = P256Account.load(sender, instance.web3j)
-                    instance.sender = sender
-                }
+                val address = if (sender.isNullOrBlank()) {
+                    instance.accountFactory.createAddress(signer.publicKey, opts?.salt ?: BigInteger.ZERO).send()
+                } else sender
+                instance.proxy = P256Account.load(address, instance.web3j)
+                instance.sender = address
                 instance.apply {
                     initCode = initCode(signer, opts, instance.accountFactory)
                     val bytes = signer.sign(Hash.sha3(Numeric.hexStringToByteArray("0xdead")))
@@ -96,10 +93,6 @@ class P256AccountBuilder(val rpcUrl: String, val signer: ISigner, val opts: Pres
                     )
                 }
             }
-        }
-
-        suspend fun init(rpcUrl: String, signer: ISigner, opts: PresetBuilderOpts): P256AccountBuilder {
-            return init(null, rpcUrl, signer, opts)
         }
 
         private fun initCode(signer: ISigner, opts: PresetBuilderOpts?, accountFactory: P256AccountFactory): String {

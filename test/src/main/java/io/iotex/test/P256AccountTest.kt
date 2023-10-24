@@ -24,7 +24,7 @@ fun main() {
     MainScope().launch {
 
         // Create account
-        val builder = P256AccountBuilder.init(RPC_URL, P256Signer(), PresetBuilderOpts(
+        val builder = P256AccountBuilder.init(null, RPC_URL, P256Signer(), PresetBuilderOpts(
             entryPoint = ENTRY_POINT,
             factory = ACCOUNT_FACTORY,
             salt = BigInteger.ZERO,
