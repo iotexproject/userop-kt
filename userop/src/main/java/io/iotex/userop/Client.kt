@@ -1,10 +1,10 @@
 package io.iotex.userop
 
-import io.iotex.userop.contract.EntryPoint
-import io.iotex.userop.provider.BundlerJsonRpcProvider
 import io.iotex.userop.api.IClient
 import io.iotex.userop.api.IUserOperationBuilder
 import io.iotex.userop.api.SendUserOperationResponse
+import io.iotex.userop.contract.EntryPoint
+import io.iotex.userop.provider.BundlerJsonRpcProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -34,8 +34,8 @@ class Client(
         return builder.buildOp(entryPoint, chainId)
     }
 
-    override suspend fun sendUserOperation(builder: IUserOperationBuilder): SendUserOperationResponse {
-        val op = this.buildUserOperation(builder)
+    override suspend fun sendUserOperation(builder: IUserOperationBuilder, userOp: UserOperation?): SendUserOperationResponse {
+        val op = userOp ?: this.buildUserOperation(builder)
         val response = provider.send(
             "eth_sendUserOperation",
             listOf(op, entryPoint),
@@ -43,7 +43,7 @@ class Client(
         )
         builder.resetOp()
 
-        return SendUserOperationResponse(response.result) {
+        return SendUserOperationResponse(response.error?.message, response.result) {
             withContext(Dispatchers.IO) {
                 val end = System.currentTimeMillis() + waitTimeoutMs
                 while (System.currentTimeMillis() < end) {
@@ -58,7 +58,7 @@ class Client(
                         DefaultBlockParameterName.LATEST
                     )
                     if (ethLog?.logs?.isNotEmpty() == true) {
-                        return@withContext ethLog.logs?.get(0) as? Log
+                        return@withContext ethLog.logs?.lastOrNull() as? Log
                     }
                     delay(waitIntervalMs)
                 }

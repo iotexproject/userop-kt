@@ -6,6 +6,6 @@ interface IClient {
 
     fun buildUserOperation(builder: IUserOperationBuilder): UserOperation
 
-    suspend fun sendUserOperation(builder: IUserOperationBuilder): SendUserOperationResponse
+    suspend fun sendUserOperation(builder: IUserOperationBuilder, userOp: UserOperation? = null): SendUserOperationResponse
 
 }

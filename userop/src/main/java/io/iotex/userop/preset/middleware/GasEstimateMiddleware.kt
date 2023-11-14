@@ -4,7 +4,8 @@ import io.iotex.userop.api.IUserOperationMiddleware
 import io.iotex.userop.api.IUserOperationMiddlewareCtx
 import io.iotex.userop.provider.JsonRpcProvider
 import org.web3j.protocol.core.Response
-import org.web3j.protocol.core.methods.response.EthBlock
+import org.web3j.utils.Numeric
+import java.math.BigInteger
 
 class UserOpGasEstimate : Response<UserOpGasEstimate.GasEstimate>() {
 
@@ -22,17 +23,18 @@ class UserOpGasEstimate : Response<UserOpGasEstimate.GasEstimate>() {
 
 class GasEstimateMiddleware(val provider: JsonRpcProvider) : IUserOperationMiddleware {
 
+    private val FUN_ESTIMATE_USER_OPERATIONGAS = "eth_estimateUserOperationGas"
+
     override fun process(ctx: IUserOperationMiddlewareCtx) {
         val gasEstimate = provider.send(
-            "eth_estimateUserOperationGas",
-            listOf(),
+            FUN_ESTIMATE_USER_OPERATIONGAS,
+            listOf(ctx.op, ctx.entryPoint),
             UserOpGasEstimate::class.java
         ).getGasEstimate()
-
         gasEstimate?.run {
-            ctx.op.preVerificationGas = preVerificationGas;
-            ctx.op.verificationGasLimit = verificationGasLimit
-            ctx.op.callGasLimit = callGasLimit
+            ctx.op.preVerificationGas = Numeric.prependHexPrefix(BigInteger(preVerificationGas).toString(16))
+            ctx.op.verificationGasLimit = Numeric.prependHexPrefix(BigInteger(verificationGasLimit).toString(16))
+            ctx.op.callGasLimit = Numeric.prependHexPrefix(BigInteger(callGasLimit).toString(16))
         }
 
     }

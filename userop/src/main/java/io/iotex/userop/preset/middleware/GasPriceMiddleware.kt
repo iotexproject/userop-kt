@@ -12,6 +12,10 @@ import java.math.BigInteger
 
 class GasPriceMiddleware(val provider: JsonRpcProvider) : IUserOperationMiddleware {
 
+    private val FUN_MAXPRIORITYFEEPERGAS = "eth_maxPriorityFeePerGas"
+    private val FUN_GET_BLOCKBY_NUMBER = "eth_getBlockByNumber"
+    private val FUN_GAS_PRICE = "eth_gasPrice"
+
     override fun process(ctx: IUserOperationMiddlewareCtx) {
         runCatching {
             val gasList = eip1559GasPrice()
@@ -26,12 +30,12 @@ class GasPriceMiddleware(val provider: JsonRpcProvider) : IUserOperationMiddlewa
 
     private fun eip1559GasPrice(): List<BigInteger> {
         val fee = provider.send(
-            "eth_maxPriorityFeePerGas",
+            FUN_MAXPRIORITYFEEPERGAS,
             emptyList(),
             EthMaxPriorityFeePerGas::class.java
         ).maxPriorityFeePerGas
         val block = provider.send(
-            "eth_getBlockByNumber",
+            FUN_GET_BLOCKBY_NUMBER,
             listOf(DefaultBlockParameterName.LATEST.value, false),
             EthBlock::class.java
         ).block
@@ -47,7 +51,7 @@ class GasPriceMiddleware(val provider: JsonRpcProvider) : IUserOperationMiddlewa
     }
 
     private fun legacyGasPrice(): List<BigInteger> {
-        val gas = provider.send("eth_gasPrice", emptyList(), EthGasPrice::class.java).gasPrice
+        val gas = provider.send(FUN_GAS_PRICE, emptyList(), EthGasPrice::class.java).gasPrice
         return listOf(
             gas,
             gas

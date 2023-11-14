@@ -1,20 +1,21 @@
 package io.iotex.userop.preset.middleware
 
-import io.iotex.userop.provider.JsonRpcProvider
 import io.iotex.userop.api.IUserOperationMiddleware
 import io.iotex.userop.api.IUserOperationMiddlewareCtx
+import io.iotex.userop.provider.JsonRpcProvider
 import org.web3j.protocol.core.Response
 
 class PaymasterMiddleware(private val paymasterRpc: String): IUserOperationMiddleware {
 
+    private val FUN_SPONSOR_USER_OPERATION = "pm_sponsorUserOperation"
+
     override fun process(ctx: IUserOperationMiddlewareCtx) {
         val provider = JsonRpcProvider(paymasterRpc)
         val pm = provider.send(
-            "pm_sponsorUserOperation",
+            FUN_SPONSOR_USER_OPERATION,
             listOf(ctx.op, ctx.entryPoint, ""),
             VerifyingPaymasterResponse::class.java
         ).getPaymaster()
-
         pm?.run {
             ctx.op.paymasterAndData = paymasterAndData
             ctx.op.callGasLimit = callGasLimit
