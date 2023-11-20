@@ -47,6 +47,7 @@ class Client(
             withContext(Dispatchers.IO) {
                 val end = System.currentTimeMillis() + waitTimeoutMs
                 while (System.currentTimeMillis() < end) {
+                    delay(waitIntervalMs)
                     val blockNumber = web3j.ethBlockNumber().send().blockNumber ?: BigInteger.ZERO
                     val startNumber = if (blockNumber - BigInteger("100") > BigInteger.ZERO) {
                         blockNumber - BigInteger("100")
@@ -58,9 +59,8 @@ class Client(
                         DefaultBlockParameterName.LATEST
                     )
                     if (ethLog?.logs?.isNotEmpty() == true) {
-                        return@withContext ethLog.logs?.lastOrNull() as? Log
+                        return@withContext ethLog.logs?.firstOrNull() as? Log
                     }
-                    delay(waitIntervalMs)
                 }
                 null
             }
