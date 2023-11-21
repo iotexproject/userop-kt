@@ -26,7 +26,9 @@ Webauthn: Web Authentication (WebAuthn) is a web standard published by the World
 
 #### Create a signer
 
-`implementation 'io.iotex:userop-kt:1.0.0'`
+```
+implementation 'io.iotex:userop-kt:1.0.0'
+```
 
 Create a signer object that provides a publicKey and a signature method.
 
