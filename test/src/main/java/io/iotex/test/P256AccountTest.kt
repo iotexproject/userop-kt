@@ -37,13 +37,27 @@ fun main() {
 
         val client = Client.init(rpcUrl = RPC_URL, entryPoint = ENTRY_POINT, bundlerRpc = BUNDLER_RPC)
 
+        // test
+        getCallData(builder)
+
         // Send currency
         sendCurrency(builder, client)
 
         // Send ERC20
         sendERC20(builder, client)
+
     }
 
+}
+
+fun getCallData(builder: P256AccountBuilder) {
+    val to = "Contract"
+    // Expecting BigInteger.ZERO when executing the contract, and providing a specific numerical value during the transfer.
+    val value = BigInteger.ZERO
+    val data = "Function Data"
+    // Executing the contract using "userop" requires the "callData."
+    val callData = builder.execute(to, value, data)
+    println("callData: $callData")
 }
 
 suspend fun sendCurrency(builder: P256AccountBuilder, client: IClient) {
@@ -62,7 +76,7 @@ suspend fun sendCurrency(builder: P256AccountBuilder, client: IClient) {
 suspend fun sendERC20(builder: P256AccountBuilder, client: IClient) {
     val erc20Contract = "Contract address"
     val to = "Receipt address"
-    val value = BigInteger.ONE
+    val value = BigInteger.ZERO
     val function = Function(
         "transfer",
         listOf(
