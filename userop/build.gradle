@@ -8,3 +8,12 @@ dependencies {
     implementation("org.web3j:core:4.10.0")
 }
 
+sourceSets {
+    main {
+        java {
+            srcDirs 'src/main/java'
+        }
+    }
+}
+
+apply from: 'binary.gradle'

@@ -50,6 +50,7 @@ object P256KeyManager {
         return Numeric.prependHexPrefix(arg01Encode + arg02Encode)
     }
 
+
     private fun getKeyStore() = KeyStore.getInstance(ANDROID_KEY_STORE).apply {
         load(null)
         if (!containsAlias(ABSTRACT_ACCOUNT_ALIAS)) {
