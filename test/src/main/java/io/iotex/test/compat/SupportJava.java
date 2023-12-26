@@ -4,7 +4,6 @@ import static java.sql.DriverManager.println;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.logging.Logger;
 
 import io.iotex.userop.api.IClient;
 import io.iotex.userop.preset.builder.P256AccountBuilder;
@@ -38,5 +37,21 @@ public class SupportJava {
         }).start();
     }
 
+
+    // Querying the remaining amount of free gas.
+    private void queryRemainFreeGas(String address) throws ExecutionException, InterruptedException {
+        Deferred<String> remainFreeGasDeferred = UseropManager.INSTANCE.queryRemainFreeGas(address);
+        CompletableFuture<String> remainFreeGasFuture = Utils.performAsyncOperation(remainFreeGasDeferred);
+        String remainFreeGas = remainFreeGasFuture.get();
+        println("remainFreeGas: " + remainFreeGas);
+    }
+
+    // Applying for free gas
+    private void applyFreeGas(String address) throws ExecutionException, InterruptedException {
+        Deferred<Boolean> applyFreeGasDeferred = UseropManager.INSTANCE.applyFreeGas(address);
+        CompletableFuture<Boolean> applyFreeGasFuture = Utils.performAsyncOperation(applyFreeGasDeferred);
+        Boolean applyFreeGasResult = applyFreeGasFuture.get();
+        println("applyFreeGasResult: " + applyFreeGasResult);
+    }
 
 }

@@ -3,17 +3,21 @@ package io.iotex.test.compat
 import io.iotex.test.BUNDLER_RPC
 import io.iotex.test.ENTRY_POINT
 import io.iotex.test.P256Signer
+import io.iotex.test.PAYMASTER_RPC
 import io.iotex.test.RPC_URL
+import io.iotex.test.RemainGasResponse
 import io.iotex.userop.Client
 import io.iotex.userop.PresetBuilderOpts
 import io.iotex.userop.api.IClient
-import io.iotex.userop.api.SendUserOperationResponse
 import io.iotex.userop.preset.builder.P256AccountBuilder
+import io.iotex.userop.provider.JsonRpcProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
+import org.web3j.protocol.core.Response
+import org.web3j.utils.Convert
 import java.math.BigInteger
 
 object UseropManager {
@@ -24,7 +28,8 @@ object UseropManager {
 
     fun initClient(): Deferred<IClient> {
         return GlobalScope.async(Dispatchers.IO) {
-            client = Client.init(rpcUrl = RPC_URL, entryPoint = ENTRY_POINT, bundlerRpc = BUNDLER_RPC)
+            client =
+                Client.init(rpcUrl = RPC_URL, entryPoint = ENTRY_POINT, bundlerRpc = BUNDLER_RPC)
             return@async client
         }
     }
@@ -47,7 +52,7 @@ object UseropManager {
     }
 
     fun sendCurrency(): Deferred<String> {
-         return GlobalScope.async(Dispatchers.IO) {
+        return GlobalScope.async(Dispatchers.IO) {
             val to = "Receipt address"
             val value = BigInteger.ONE
             val data = "0x"
@@ -58,7 +63,32 @@ object UseropManager {
             val txHash = response.wait()
             println("userOpHash: $userOpHash")
             println("txHash: $txHash")
-             return@async txHash?.transactionHash ?: ""
+            return@async txHash?.transactionHash ?: ""
+        }
+    }
+
+    fun queryRemainFreeGas(address: String): Deferred<String> {
+        return GlobalScope.async(Dispatchers.IO) {
+            val response = JsonRpcProvider(PAYMASTER_RPC).send(
+                "pm_gasRemain",
+                listOf(address),
+                RemainGasResponse::class.java
+            )
+            val remainFreeGas = Convert.fromWei(response.result?.remain ?: "0", Convert.Unit.ETHER)
+            println("remain free gas: $remainFreeGas")
+            return@async remainFreeGas.toString()
+        }
+    }
+
+    fun applyFreeGas(address: String): Deferred<Boolean> {
+        return GlobalScope.async(Dispatchers.IO) {
+            val response = JsonRpcProvider(PAYMASTER_RPC).send(
+                "pm_requestGas",
+                listOf(address),
+                Response<Boolean>()::class.java
+            )
+            println("apply free gas result: ${response.result}")
+            return@async response.result
         }
     }
 

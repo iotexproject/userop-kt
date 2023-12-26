@@ -5,12 +5,15 @@ import io.iotex.userop.PresetBuilderOpts
 import io.iotex.userop.api.IClient
 import io.iotex.userop.preset.builder.P256AccountBuilder
 import io.iotex.userop.preset.middleware.PaymasterMiddleware
+import io.iotex.userop.provider.JsonRpcProvider
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.web3j.abi.FunctionEncoder
 import org.web3j.abi.datatypes.Address
 import org.web3j.abi.datatypes.Function
 import org.web3j.abi.datatypes.generated.Uint256
+import org.web3j.protocol.core.Response
+import org.web3j.utils.Convert
 import java.math.BigInteger
 
 const val RPC_URL = "https://babel-api.testnet.iotex.io"
@@ -46,6 +49,11 @@ fun main() {
         // Send ERC20
         sendERC20(builder, client)
 
+        // Querying the remaining amount of free gas.
+        queryRemainFreeGas(builder.sender)
+
+        // Applying for free gas
+        applyFreeGas(builder.sender)
     }
 
 }
@@ -93,4 +101,31 @@ suspend fun sendERC20(builder: P256AccountBuilder, client: IClient) {
     val txHash = response.wait()
     println("userOpHash: $userOpHash")
     println("txHash: $txHash")
+}
+
+suspend fun queryRemainFreeGas(address: String) {
+    val response = JsonRpcProvider(PAYMASTER_RPC).send(
+        "pm_gasRemain",
+        listOf(address),
+        RemainGasResponse::class.java
+    )
+    val remainFreeGas = Convert.fromWei(response.result?.remain ?: "0", Convert.Unit.ETHER)
+    println("remain free gas: $remainFreeGas")
+}
+
+suspend fun applyFreeGas(address: String) {
+    val response = JsonRpcProvider(PAYMASTER_RPC).send(
+        "pm_requestGas",
+        listOf(address),
+        Response<Boolean>()::class.java
+    )
+    println("apply free gas result: ${response.result}")
+}
+
+class RemainGasResponse : Response<RemainGas>()
+
+class RemainGas {
+    val remain: String = "0x0"
+    val last_request: Int = 0
+    val total_used: String = "0"
 }
